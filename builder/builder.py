@@ -72,7 +72,7 @@ def RunPyinst():
 
 def Compile():
     print()
-    if not Config.wood["dev-build"]: ChangeDevMode(False, )
+    if not Config.wood["dev-build"]: ChangeDevMode(False)
 
 def Splash():
     LIGHT = fg(236,135,233) + '█'
@@ -92,6 +92,26 @@ def Splash():
     print(f"{fg(255,67,124)} VERSION: {BUILDER_VERSION}")
     print()
 
-if __name__ == '__main__':
+def set_title(text: str = ""):
+    if os.name == 'nt':
+        import ctypes
+        try:
+            k32 = ctypes.WinDLL('kernel32', use_last_error=True)
+            k32.SetConsoleTitleW(text)
+            k32.SetConsoleMode(k32.GetStdHandle(-11), 7)
+        except (WindowsError, IOError, RuntimeError):
+            ctypes.WinError(ctypes.get_last_error())
+            os.system(f'title {text}')
+        os.system('color')
+    else:
+        sys.stdout.write(b'\33]0;' + text + b'\a')
+        sys.stdout.flush()
+        os.system('')
+
+def Setup():
     LoadConfig()
+    set_title(f"pyCarpenter v{BUILDER_VERSION}")
     Splash()
+
+if __name__ == '__main__':
+    Setup()
