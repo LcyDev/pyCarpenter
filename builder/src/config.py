@@ -1,3 +1,5 @@
+import yaml
+
 class BuildConfig:
     class wood:
         name: str
