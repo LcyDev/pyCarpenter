@@ -12,32 +12,6 @@ _VARSPY_DIR = "../src/wood/game/_vars.py"
 
 compiling = False
 
-def TitleLoop( bits: str ):
-    while compiling: # Tambien odio esto.
-        Title(f"Building {bits}")
-        sleep(1)
-        Title(f"Building {bits}.")
-        sleep(1)
-        Title(f"Building {bits}..")
-        sleep(1)
-        Title(f"Building {bits}...")
-        sleep(1)
-
-def Title(title = "pyBuilder v3.0"):
-    if os.name == 'nt':
-        try:
-            k32 = ctypes.WinDLL('kernel32', use_last_error=True)
-            k32.SetConsoleTitleW(title)
-            k32.SetConsoleMode(k32.GetStdHandle(-11), 7)
-        except (WindowsError, IOError, RuntimeError):
-            ctypes.WinError(ctypes.get_last_error())
-            os.system(f'title {title}')
-        os.system('color')
-    else:
-        sys.stdout.write(b'\33]0;' + title + b'\a')
-        sys.stdout.flush()
-        os.system("")
-
 def ChangeDevMode( state: bool, bits ):
     # Deactivate/Activate dev mode
     with open(_VARSPY_DIR, 'r') as file:
@@ -143,17 +117,3 @@ def Compile( bits: str, params: list ):
     ChangeDevMode( True, bits )
     CreateBuild( bits )
     # Cls()
-
-class Config:
-    python: dict
-    builder: dict
-    wood: dict
-
-    def __init__( self, data: dict ):
-        self.python = data["python"]
-        self.builder = data["builder"]
-        self.wood = data["wood"]
-
-params = []
-if config.python["x64"]: Compile("x64", params)
-if config.python["x86"]: Compile("x86", params)

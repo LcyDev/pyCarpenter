@@ -3,42 +3,6 @@ from sty import *
 from utils.funcs import *
 import config
 
-
-
-def setup():
-    clear()
-    if config.modules["32Bits"]:
-        try:
-            subprocess.call(config.pyPaths["Ins32"], creationflags=subprocess.CREATE_NO_WINDOW)
-        except FileNotFoundError:
-            warn("[WARN] Pyinstaller (x32) wasn't found:")
-            config.modules["32Bits"] = False
-    if config.modules["64Bits"]:
-        try:
-            subprocess.call(config.pyPaths["Ins64"], creationflags=subprocess.CREATE_NO_WINDOW)
-        except FileNotFoundError:
-            warn("[WARN] Pyinstaller (x64) wasn't found: ")
-            config.modules["64Bits"] = False
-
-def cReload():
-    import importlib
-    importlib.reload(config)
-    main()
-
-def main():
-    setup()
-    while True:
-        print(f'{fg(160,85,212)}Version: {config.options["version"]}')
-        print()
-        print(f"{fg.magenta}-----<< {fg(240,210,40)}OPTIONS {fg.magenta}>>-----{fg.rs}")
-        mPrint(f"[1].", f"{fg(93)}Obfuscate Code")
-        mPrint("[2].", f"{fg(27)}EXECompiler")
-        mPrint("[3].", f"{fg(11)}EXESigner")
-        mPrint("[4].", f"{fg(166)}RARCompress")
-        print()
-        mPrint("[0].", f"{fg.li_red}[EXIT]")
-        print()
-
 def obfuscate():
     if not os.path.isfile(config.pyPaths["hyperion"]):
         warn("[WARN] Hyperion script wasn't found\n")
@@ -192,7 +156,3 @@ def rar(x64=False):
         print(fg.rs)
     except Exception as e:
         warn(f"{e}\n")
-
-if __name__ == "__main__":
-    title()
-    main()
