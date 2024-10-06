@@ -3,6 +3,9 @@ import yaml, pprint
 import dataclasses
 from sty import fg, bg
 
+from src.utils import CLS, addStrIf, joinIfStr, extIfStr, join
+
+DEBUG = False
 BUILDER_VERSION = 4.0
 CONFIG_PATH = "default.yml"
 
@@ -28,47 +31,45 @@ def LoadConfig():
     with open(CONFIG_PATH, 'rb') as f:
         config = yaml.safe_load(f.read())
 
-def CLS(new_line=True):
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
-    if new_line:
-        print()
-
-def joinStrIf(iterable: list, body: str, string: str):
-    if string: iterable.append(body%string)
-
-def addStrIf(iterable: list, string: str, check: bool):
-    if check: iterable.append(string)
-
-def RunPyinst():
-    pyinstaller = Config.pyinstaller
-    PyPath = pyinstaller.paths
+def GetCMD_FLAGS():
     flags = 0
     if Config.python["show_progress"]:
         flags |= subprocess.CREATE_NO_WINDOW
+
+def GetCMD_Nuitka():
+    nuitka = Config.nuitka
     cmd = []
+    return cmd
 
-    joinStrIf(cmd, "--icon %s", pyinstaller.cfg["icon"])
-    joinStrIf(cmd, "--name %s", pyinstaller.cfg["app-name"])
+def GetCMD_PyIns():
+    pyins = Config.pyinstaller
+    if not pyins.cfg["command"]: return
 
-    addStrIf(cmd, "--noconfirm", pyinstaller.options["confirm-replace"])
-    addStrIf(cmd, "--clean", pyinstaller.options["clean"])
-    addStrIf(cmd, "--onefile", pyinstaller.options["onefile-mode"])
-    joinStrIf(cmd, "--log-level %s", pyinstaller.options["log-level"])
+    cmd = []
+    cmd.append(pyins.cfg["command"])
 
-    joinStrIf(cmd, "--distpath %s", PyPath["output-path"])
-    joinStrIf(cmd, "--workpath %s", PyPath["work-path"])
-    joinStrIf(cmd, "--specpath %s", PyPath["spec-path"])
-    joinStrIf(cmd, "--contents-directory %s", PyPath["contents-dir"])
+    addStrIf(cmd, "--noconfirm", pyins.options["confirm-replace"])
+    addStrIf(cmd, "--clean", pyins.options["clean"])
+    addStrIf(cmd, "--onefile", pyins.options["onefile-mode"])
+    joinIfStr(cmd, "--log-level=", pyins.options["log-level"])
 
-    cmd.extend([f'--add-data {i}' for i in pyinstaller.extra_data if i])
-    cmd.extend([f'--add-binary {i}' for i in pyinstaller.extra_binary if i])
-    cmd.extend([f'--paths {i}' for i in pyinstaller.import_paths if i])
-    cmd.extend([f'--hidden-import={i}' for i in pyinstaller.proyect_imports if i])
-    cmd.extend([f'--hidden-import={i}' for i in pyinstaller.hidden_imports if i])
-    cmd.extend([i for i in pyinstaller.extras if i])
+    joinIfStr(cmd, '--distpath=', pyins.paths["output-path"])
+    joinIfStr(cmd, '--workpath=', pyins.paths["work-path"])
+    joinIfStr(cmd, '--specpath=', pyins.paths["spec-path"])
+    joinIfStr(cmd, '--contents-directory=', pyins.paths["contents-dir"])
+
+    extIfStr(cmd, '--add-data=', pyins.extra_data)
+    extIfStr(cmd, '--add-binary=', pyins.extra_binary)
+    extIfStr(cmd, '--paths=', pyins.import_paths)
+    extIfStr(cmd, '--hidden-import=', pyins.proyect_imports)
+    extIfStr(cmd, '--hidden-import=', pyins.hidden_imports)
+    cmd.extend([i for i in pyins.extras if i])
+
+    joinIfStr(cmd, '--name=', pyins.cfg["app-name"])
+    joinIfStr(cmd, '--icon=', pyins.cfg["icon"])
+
+    cmd.append(pyins.cfg["script"])
+    return cmd
 
 def Compile():
     print()
