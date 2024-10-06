@@ -3,46 +3,28 @@ import yaml, pprint
 import dataclasses
 from sty import fg, bg
 
+from src.config import CFG, LoadConfig
 from src.utils import CLS, addStrIf, joinIfStr, extIfStr, join
+
 
 DEBUG = False
 BUILDER_VERSION = 4.0
-CONFIG_PATH = "default.yml"
 
-class BuildConfig:
-    wood: dict
-    build: dict
-    python: dict
-    nuitka: dict
-    class pyinstaller:
-        cfg: dict
-        paths: dict
-        options: dict
-        extra_data: list[str]
-        extra_binary: list[str]
-        import_paths: list[str]
-        proyect_imports: list[str]
-        hidden_imports: list[str]
-        extras: list[str]
-
-Config = BuildConfig()
-
-def LoadConfig():
-    with open(CONFIG_PATH, 'rb') as f:
-        config = yaml.safe_load(f.read())
+CONFIG_PATH = "config.yml"
+DEFAULT_CFG_PATH = "default.yml"
 
 def GetCMD_FLAGS():
     flags = 0
-    if Config.python["show_progress"]:
+    if CFG.python["show_progress"]:
         flags |= subprocess.CREATE_NO_WINDOW
 
 def GetCMD_Nuitka():
-    nuitka = Config.nuitka
+    nuitka = CFG.nuitka
     cmd = []
     return cmd
 
 def GetCMD_PyIns():
-    pyins = Config.pyinstaller
+    pyins = CFG.pyinstaller
     if not pyins.cfg["command"]: return
 
     cmd = []
@@ -73,7 +55,7 @@ def GetCMD_PyIns():
 
 def Compile():
     print()
-    if not Config.wood["dev-build"]: ChangeDevMode(False)
+    if not CFG.wood["dev-build"]: ChangeDevMode(False)
 
 def Splash():
     LIGHT = fg(236,135,233) + '█'
