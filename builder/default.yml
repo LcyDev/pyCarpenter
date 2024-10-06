@@ -5,7 +5,7 @@ wood:
   beta-build: true
 
 build:
-  64Bits: false
+  x64: false
   # Build 64-bit executables. If false, only 32-bit executables will be built.
   PreTest: false
   # Test the program before building.
@@ -123,6 +123,39 @@ pyinstaller:
     - "urllib3"
 
   extras: [
+    # --collect-submodules MODULENAME
+    #     Collect all submodules from the specified package or module. This option can be used multiple times.
+
+    # --collect-data MODULENAME, --collect-datas MODULENAME
+    #     Collect all data from the specified package or module. This option can be used multiple times.
+
+    # --collect-binaries MODULENAME
+    #    Collect all binaries from the specified package or module. This option can be used multiple times.
+
+    # --collect-all MODULENAME
+    #     Collect all submodules, data files, and binaries from the specified package or module. This option can be used multiple times.
+
+    # --copy-metadata PACKAGENAME
+    #    Copy metadata for the specified package. This option can be used multiple times.
+
+    # --recursive-copy-metadata PACKAGENAME
+    #    Copy metadata for the specified package and all its dependencies. This option can be used multiple times.
+
+    # --additional-hooks-dir HOOKSPATH
+    #    An additional path to search for hooks. This option can be used multiple times.
+
+    # --runtime-hook RUNTIME_HOOKS
+    #    Path to a custom runtime hook file. A runtime hook is code that is bundled with the executable and is executed before any other code or module to set up special features of the runtime environment. This option can be used multiple times.
+
+    # --exclude-module EXCLUDES
+    #    Optional module or package (the Python name, not the path name) that will be ignored (as though it was not found). This option can be used multiple times.
+
+    # --splash IMAGE_FILE
+    #    (EXPERIMENTAL) Add an splash screen with the image IMAGE_FILE to the application. The splash screen can display progress updates while unpacking.
+
+    # How To Generate
+    # Windows And Mac Os X Specific Options
+    # Windows Specific Options
   ]
 
 obfuscator:
