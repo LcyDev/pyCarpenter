@@ -14,6 +14,19 @@ build:
   AutoRun: false
   # Run the built program.
 
+package:
+  folders:
+    - "mods"
+    - "saves"
+
+  excluded:
+    - "*.py"
+    - "*.pyc"
+    - "*.pyw"
+
+  included:
+    - "include/*"
+
 python:
   x64: "python"
   x86: "python"
@@ -21,10 +34,12 @@ python:
 
 nuitka: TODO
 
+# https://pyinstaller.org/en/stable/usage.html#options
+# https://pyinstaller.org/en/stable/usage.html#what-to-bundle-where-to-search
 pyinstaller:
   cfg:
     command: "pyinstaller"
-    # Command to use for Py
+    # Command to use for PyInstaller
     app-name: "Wood"
     # Name to assign to the bundled app and spec file (default: first script’s basename)
     script: "../src/wood/Master.py"
@@ -71,7 +86,7 @@ pyinstaller:
     # To put a file in the top-level application directory, use . as a dest_dir.
     - ""
 
-  imports:
+  import-paths:
     # A path to search for imports (like using PYTHONPATH).
     # Multiple paths are allowed, separated by ':' or adding more lines.
     # Equivalent to supplying the pathex argument in the spec file.
@@ -107,7 +122,17 @@ pyinstaller:
     - "typing_extensions"
     - "urllib3"
 
-  collect-submodules: []
-    # Collect all submodules from the specified package or module. This option can be used multiple times.
+  extras: [
+  ]
 
-  extras: []
+obfuscator:
+  testing: true
+  flags:
+    automatic: true
+    rename-vars: false
+    protect-chunks: false
+  folders:
+    - "../src/wood": ""
+    - "../src/wood/game": "game"
+    - "../src/wood/utils": "utils"
+    - "../src/wood/soundpacks": "soundpacks"
