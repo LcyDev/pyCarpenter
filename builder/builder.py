@@ -1,6 +1,4 @@
 import os, subprocess, shutil
-import yaml, pprint
-import dataclasses
 from sty import fg, bg
 
 from src.config import CFG, LoadConfig
@@ -12,6 +10,10 @@ BUILDER_VERSION = 4.0
 
 CONFIG_PATH = "config.yml"
 DEFAULT_CFG_PATH = "default.yml"
+
+class Work:
+    compiling: bool
+    bits: str
 
 def GetCMD_FLAGS():
     flags = 0
@@ -54,8 +56,10 @@ def GetCMD_PyIns():
     return cmd
 
 def Compile():
+    if not CFG.wood["dev-build"]:
+        ChangeDevMode(False)
     print()
-    if not CFG.wood["dev-build"]: ChangeDevMode(False)
+    
 
 def Splash():
     LIGHT = fg(236,135,233) + '█'
@@ -75,7 +79,7 @@ def Splash():
     print(f"{fg(255,67,124)} VERSION: {BUILDER_VERSION}")
     print()
 
-def set_title(text: str = ""):
+def Title(text: str = f"pyCarpenter v{BUILDER_VERSION}"):
     if os.name == 'nt':
         import ctypes
         try:
@@ -91,9 +95,18 @@ def set_title(text: str = ""):
         sys.stdout.flush()
         os.system('')
 
+def TitleLoop():
+    import time
+    dots = 0
+    while Work.compiling:
+        Title(f"Building {Work.bits}{'.'*dots}")
+        dots = (dots + 1) % 4
+        time.sleep(1)
+    Title()
+
 def Setup():
     LoadConfig()
-    set_title(f"pyCarpenter v{BUILDER_VERSION}")
+    Title()
     Splash()
 
 if __name__ == '__main__':
