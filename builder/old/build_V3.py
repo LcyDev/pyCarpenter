@@ -12,64 +12,6 @@ _VARSPY_DIR = "../src/wood/game/_vars.py"
 
 compiling = False
 
-def ChangeDevMode( state: bool, bits ):
-    # Deactivate/Activate dev mode
-    with open(_VARSPY_DIR, 'r') as file:
-        fileContent = file.read()
-        file.seek(0)
-
-        for line in file.readlines():
-
-            lineSplited = line.lstrip().split(" ")
-
-            if lineSplited[0] == 'devMode':
-                if "True" in lineSplited[2]: value = True
-                else: value = False
-                fileContent = fileContent.replace( f"    devMode = {value}\n", f"    devMode = {state}\n" ) # odio esto
-
-            elif lineSplited[0] == '"allowDev":':
-                if "True" in lineSplited[1]: value = True
-                else: value = False
-                fileContent = fileContent.replace( f'        "allowDev": {value},\n', f'        "allowDev": {state},\n' ) # odio esto
-
-        file.close()
-
-    with open(_VARSPY_DIR, 'w') as file:
-        file.write(fileContent)
-        file.close()
-
-    # Change the soundpacks path.
-    with open(SOUNDPACKFUNCS_DIR, 'r+') as file:
-        soundpacksDir = {
-            True: 'SOUNDPACKS_DIR = "../src/wood/soundpacks"\n', # Dev
-            False: 'SOUNDPACKS_DIR = "./soundpacks"\n' # No-dev
-        }
-
-        fileLines = file.readlines()
-        fileLines[0] = soundpacksDir[state] # First line
-
-        file.close()
-
-    with open(SOUNDPACKFUNCS_DIR, 'w') as file:
-        file.write("".join(fileLines))
-
-    if bits == "x86":
-        if not state:
-            with open(MASTERPY_DIR, 'r+') as file:
-                newFile = 'import os\narchitew6432 = os.environ.get("PROCESSOR_ARCHITEW6432")\nos.environ.__delitem__("PROCESSOR_ARCHITEW6432")\nos.environ.__setitem__("PROCESSOR_ARCHITEW6432",architew6432)\n'
-                fileContent = file.read()
-                newFile += fileContent
-                file.close()
-
-            pathlib.Path(MASTERPY_DIR).rename(MASTERPY_DIR + "tmp")
-
-            with open(MASTERPY_DIR, 'w') as file:
-                file.write(newFile)
-
-        if state and pathlib.Path(MASTERPY_DIR + "tmp").is_file():
-            os.remove(MASTERPY_DIR)
-            pathlib.Path(MASTERPY_DIR + "tmp").rename(MASTERPY_DIR)
-
 def ChangelogGenerator( file ):
     pass
 
@@ -110,10 +52,8 @@ def Compile( bits: str, params: list ):
     Thread(target=TitleLoop, args=(bits, ), daemon=True).start()
     try: subprocess.run( f'"{config.python[bits]}" -m nuitka {cmd}', creationflags=flags )
     except:
-        ChangeDevMode( True, bits )
         return
     compiling = False
 
-    ChangeDevMode( True, bits )
     CreateBuild( bits )
     # Cls()

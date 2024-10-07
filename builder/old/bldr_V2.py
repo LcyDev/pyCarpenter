@@ -20,35 +20,9 @@ def obfuscate():
             if file == "__init__.py":
                 shutil.copy2(f"{k}/{file}", f"obfuscated/{v}")
                 continue
-            elif file in {"Master.py","_vars.py"}:
-                with open(f"{k}/{file}", 'r') as f:
-                    data = f.read()
-                if file == "Master.py":
-                    data.replace(' devPath()', ' #devPath()')
-                    data.replace(' logger()', ' #logger()')
-                else:
-                    defaults = {
-                        "devMode =": False,
-                        "godMode =": False,
-                        "passThrough =": False,
-                        '"debugMode":': False,
-                        '"allowDev":': False,
-                        '"allowMP":': False,
-                        '"saveCfg":': True,
-                        '"loadCfg":': True,
-                    }
-                    for ks, vs in defaults.items():
-                        data = data.replace(f"{ks} {not vs}", f"{ks} {vs}")
-                with open(f"utils/{file}", 'w') as f:
-                    f.write(data)
-                path = f"utils/{file}"
             cmd = ['py', config.pyPaths["hyperion"], f'--file="{path}"', f'--destiny="obfuscated/{v}"', '--rename=False', f'-sr={not config.hyperion["RenameVars"]}', f'-sc={not config.hyperion["ProtectChunks"]}', f'-auto={config.hyperion["automatic"]}', '-logo=False']
             subprocess.run(cmd)
             print(fg.rs, end='')
-    if os.path.isfile("utils/Master.py"):
-        os.remove("utils/Master.py")
-    if os.path.isfile("utils/_vars.py"):
-        os.remove("utils/_vars.py")
     if config.hyperion["doTesting"]:
         try:
             child = subprocess.Popen(['py', 'Master.py'], cwd="obfuscated", creationflags=subprocess.CREATE_NEW_CONSOLE)
