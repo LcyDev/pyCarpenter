@@ -1,111 +1,142 @@
-wood:
+# Note: The '*' character is a wildcard that matches any characters in a file name
+
+program:
   name: "Wood"
   version: "2.0snap4-b1"
   dev-build: false
   beta-build: true
 
 build:
-  x64: false
-  # Build 64-bit executables. If false, only 32-bit executables will be built.
-  PreTest: false
-  # Test the program before building.
-  AutoClean: false
+  # Use the nuitka compiler instead of Pyinstaller.
+  use-nuitka: false
+  # Build 64-bit executables.
+  # If false: Only 32-bit executables will be built.
+  make-x64: false
+  # Ensure the program works before building.
+  test-before: true
   # Clean the build directory before building.
-  AutoRun: false
-  # Run the built program.
+  auto-clean: false
+  # Automatically run the built program for testing.
+  auto-run: false
 
 package:
+  # Output directory for the bundled application
+  output-dir: "./dist"
+
+  # Create empty directories in the bundled application
   folders:
     - "mods"
     - "saves"
 
+  # Exclude files and directories from the bundled application
   excluded:
     - "*.py"
     - "*.pyc"
     - "*.pyw"
 
+  # Include files and directories in the bundled application
   included:
     - "include/*"
 
 python:
+  # Path or command to 64-bit Python executable (e.g. python.exe)
   x64: "python"
+  # Path or command to 32-bit Python executable (e.g. python.exe)
   x86: "python"
+  # Display progress during execution
   show-progress: true
 
 nuitka: TODO
 
 # https://pyinstaller.org/en/stable/usage.html#options
-# https://pyinstaller.org/en/stable/usage.html#what-to-bundle-where-to-search
 pyinstaller:
   cfg:
-    command: "pyinstaller"
-    # Command to use for PyInstaller
+    # Name to assign to the bundled app and spec file (default: first script's basename)
     app-name: "Wood"
-    # Name to assign to the bundled app and spec file (default: first script’s basename)
-    script: "../src/wood/Master.py"
+
+    # Command to use for PyInstaller. Use {python} for the Python executable
+    command: "{python} -m pyinstaller"
     # Name of scriptfiles to be processed or exactly one .spec file.
-    # If a .spec file is specified, most options are unnecessary and are ignored.
+
+    script: "../src/wood/Master.py"
+    # Note: If a .spec file is specified, most options are ignored
+
+    # Icon settings for the executable
+    #   - "FILE.ico": Apply the icon to a Windows executable.
+    #   - "FILE.icns": Apply the icon to a Mac OS .app bundle.
+    #   - "FILE.exe,ID": Extract the icon with ID from an exe.
+    #   - "Image": Apply the image to the executable with Pillow.
+    #   - "NONE": Don't apply any icon, use default. (PyInstaller’s icon)
     icon: "NONE"
-    # FILE.ico: apply the icon to a Windows executable.
-    # FILE.exe,ID: extract the icon with ID from an exe.
-    # FILE.icns: apply the icon to the .app bundle on Mac OS.
-    # Image: apply the image to the executable.
-    # Use “NONE” to not apply any icon, the OS shows a default (PyInstaller’s icon).
-    # [!] If Pillow installed, tries to translate the the icon into the correct format.
+    # [!] If Pillow installed, the icon will be translated into the correct platform format. (Windows: ico, Mac: icns)
 
   paths:
-    output-path: "./output"
     # Where to put the bundled app (default: ./dist)
+    output-path: "./output"
+    # Where to put all the temporary work files (.log, .pyz, etc) (default: ./build)
     work-path: "./tmp"
-    # Where to put all the temporary work files, .log, .pyz and etc. (default: ./build)
+    # Where to store the generated spec file (default: current directory)
     spec-path: "./spec"
-    # Folder to store the generated spec file (default: current directory)
+    # (ONE-DIR) Where to store all supporting files (everything except the executable itself).
     contents-dir: "./library"
-    # (ONEDIR) Specify the name of the directory in which all supporting files (i.e. everything except the executable itself) will be placed in. Use “.” to re-enable old onedir layout without contents directory.
+    # Note: Use "." to use old ONE-DIR layout without a contents directory
 
   options:
-    confirm-replace: true
-    # Replace output directory (default: SPECPATH/dist/SPECNAME) without asking for confirmation
-    clean: true
     # Clean PyInstaller cache and remove temporary files before building.
+    clean: true
+    # Replace previous output without asking for confirmation.
+    no-confirm: false
+    # Bundle the application into a single executable file.
     onefile-mode: false
-    # Create a one-file bundled executable.
+    # Set the verbosity level for build-time console messages
+    # Levels: (TRACE, DEBUG, INFO, WARN, DEPRECATION, ERROR, FATAL)
     log-level: INFO
-    # Amount of detail in build-time console messages. Default: INFO.
-    # Levels: TRACE, DEBUG, INFO, WARN, DEPRECATION, ERROR, FATAL
 
-  extra-data:
-    # Additional data files or directories containing data files to be added to the application.
-    # Example: "SOURCE:DEST_DIR"
-    # To put a file in the top-level application directory, use . as a dest_dir.
-    - ""
+  # Additional data files or directories containing data files to be added to the application.
+  # Format: "SOURCE:DEST_DIR"
+  #   - SOURCE: Path to the file or directory to include
+  #   - DEST_DIR: Destination directory within the application (use "." for top-level directory)
+  extra-data: []
 
-  extra-binary:
-    # Additional binary files to be added to the executable.
-    # Example: "SOURCE:DEST_DIR"
-    # To put a file in the top-level application directory, use . as a dest_dir.
-    - ""
+  # Additional binary files to be added to the executable.
+  # Format: "SOURCE:DEST_DIR"
+  #   - SOURCE: Path to the file to include
+  #   - DEST_DIR: Destination directory within the application (use "." for top-level directory)
+  extra-binary: []
 
+  # Additional import paths for PyInstaller to search for modules (equivalent to PYTHONPATH)
+  # Multiple paths are allowed, separated by ':' or adding more lines.
   import-paths:
-    # A path to search for imports (like using PYTHONPATH).
-    # Multiple paths are allowed, separated by ':' or adding more lines.
-    # Equivalent to supplying the pathex argument in the spec file.
     - "../src/wood/"
 
+  # Specify relative imports not visible in the code.
   proyect-imports:
-    # Name a relative import not visible in the code of the script(s). This option can be used multiple times.
     - "xGame"
-    - "game._vars"
-    - "game.menus"
-    - "game.menu_funcs"
+    - "data._vars"
+    - "data._code"
+    - "data.initialize"
+    - "game.menus.actions"
+    - "game.menus.extras"
+    - "game.menus.managing"
+    - "game.menus.primary"
+    - "game.logic.car"
+    - "game.logic.mine"
     - "utils.funcs"
     - "utils.alt_funcs"
     - "utils.game_funcs"
-    - "utils.thread_funcs"
     - "utils.soundpack_funcs"
+    - "utils.thread_funcs"
+    - "utils.cmd.normal"
+    - "utils.cmd.debug"
+    - "utils.cmd.dev"
+    - "utils.manager.audio_man"
+    - "utils.manager.config_man"
+    - "utils.manager.mod_man"
+    - "utils.manager.save_man"
+    - "utils.libs.unique_man"
 
+  # Specify hidden imports not visible in the code.
   hidden-imports:
-    # Name an import not visible in the code of the script(s). This option can be used multiple times.
     - "certifi"
     - #"cffi"
     - "charset_normalizer"
@@ -122,50 +153,34 @@ pyinstaller:
     - "typing_extensions"
     - "urllib3"
 
-  extras: [
-    # --collect-submodules MODULENAME
-    #     Collect all submodules from the specified package or module. This option can be used multiple times.
-
-    # --collect-data MODULENAME, --collect-datas MODULENAME
-    #     Collect all data from the specified package or module. This option can be used multiple times.
-
-    # --collect-binaries MODULENAME
-    #    Collect all binaries from the specified package or module. This option can be used multiple times.
-
-    # --collect-all MODULENAME
-    #     Collect all submodules, data files, and binaries from the specified package or module. This option can be used multiple times.
-
-    # --copy-metadata PACKAGENAME
-    #    Copy metadata for the specified package. This option can be used multiple times.
-
-    # --recursive-copy-metadata PACKAGENAME
-    #    Copy metadata for the specified package and all its dependencies. This option can be used multiple times.
-
-    # --additional-hooks-dir HOOKSPATH
-    #    An additional path to search for hooks. This option can be used multiple times.
-
-    # --runtime-hook RUNTIME_HOOKS
-    #    Path to a custom runtime hook file. A runtime hook is code that is bundled with the executable and is executed before any other code or module to set up special features of the runtime environment. This option can be used multiple times.
-
-    # --exclude-module EXCLUDES
-    #    Optional module or package (the Python name, not the path name) that will be ignored (as though it was not found). This option can be used multiple times.
-
-    # --splash IMAGE_FILE
-    #    (EXPERIMENTAL) Add an splash screen with the image IMAGE_FILE to the application. The splash screen can display progress updates while unpacking.
-
-    # How To Generate
-    # Windows And Mac Os X Specific Options
-    # Windows Specific Options
-  ]
+  extras: []
 
 obfuscator:
+  # Test the resulting obfuscated code.
   testing: true
+  # The obfuscated code will be saved to this directory
+  output-dir: "./obfuscated"
+  # Retry the obfuscation process if it fails
+  # [!] This can increase the execution time of the obfuscation process or run into a loop.
+  retry: true
   flags:
+    # Removes requirement of input to exit.
     automatic: true
+    # Use this if you want to redefine the variables
+    # [!] Be aware that this can cause some bugs on very complex scripts, but generally it should work
     rename-vars: false
-    protect-chunks: false
+    # Use this if you have variable defined on multiple lines
+    # Use this to prevent adding a shell to each chunk in your script
+    protect-chunks: true
+  # Where to search for scripts, and their relative destination.
   folders:
     - "../src/wood": ""
+    - "../src/wood/data": "data"
     - "../src/wood/game": "game"
+    - "../src/wood/game/menus": "game/menus"
+    - "../src/wood/game/logic": "game/logic"
+    - "../src/wood/game/rooms": "game/rooms"
     - "../src/wood/utils": "utils"
-    - "../src/wood/soundpacks": "soundpacks"
+    - "../src/wood/utils/cmd": "utils/cmd"
+    - "../src/wood/utils/manager": "utils/manager"
+    - "../src/wood/utils/libs": "utils/libs"
