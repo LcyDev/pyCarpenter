@@ -2,8 +2,7 @@ import os, subprocess, shutil, re
 from sty import fg, bg
 
 from src.config import CFG, LoadConfig
-from src.utils import CLS, addStrIf, joinIfStr, extIfStr, join
-
+from src.utils import CLS, addStrIf, joinIfStr, extIfStr
 
 DEBUG = False
 BUILDER_VERSION = 4.0
@@ -97,39 +96,15 @@ def ChangeCompileMode(state: bool):
         'IS_COMPILED': None,
     }
     MASTER_PY = ''
-
     ToggleFile(MASTER_PY, master_defaults, state, type_hint=False)
 
 
-def SetBuildMode(state):
-    with open("Master.py", 'r+') as f:
-        fileContent = f.read()
-        f.seek(0)
-        fileContent.replace()
-
-    rep = {
-        "doClear": True,
-        "allowDev": False,
-        "allowMods": False,
-        "checkVersion": True,
-        "saveCFG": True,
-        "loadCFG": True,
-    }
-
-    with open("_code.py", 'r+') as f:
-        fileContent = f.read()
-        f.seek(0)
-        for line in f.readlines():
-            line_split = line.lstrip().rstrip().split(': bool = ')
-            if len(line_split) == 1: continue
-            if val := rep.get(line_split[0]) is not None:
-                fileContent = fileContent.replace(f"{val}: bool = {line_split[1]}", f"{val}: bool = {state}")
-
 def Compile():
-    if not CFG.wood.dev_build:
+    if not CFG.program.dev_build:
         ChangeDevMode(False)
+    ChangeCompileMode(True)
     print()
-    
+    ChangeCompileMode(False)
 
 def Splash():
     LIGHT = fg(236,135,233) + '█'
