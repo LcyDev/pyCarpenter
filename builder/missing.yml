@@ -1,0 +1,52 @@
+pyinstaller:
+  # https://pyinstaller.org/en/stable/usage.html#what-to-bundle-where-to-search
+
+  bundles:
+    # Collect all submodules from the specified package or module.
+    # --collect-submodules MODULENAME
+    collect-submodules: []
+
+    # Collect all data from the specified package or module.
+    # --collect-data MODULENAME
+    collect-data: []
+
+    # Collect all binaries from the specified package or module.
+    # --collect-binaries MODULENAME
+    collect-binaries: []
+
+    # Collect all submodules, data files, and binaries from the specified package or module. 
+    # --collect-all MODULENAME
+      collect-all: []
+
+    # Copy metadata for the specified package.
+    # --copy-metadata PACKAGENAME
+    copy-metadata: []
+
+    # Copy metadata for the specified package and all its dependencies.
+    # --recursive-copy-metadata PACKAGENAME
+    recursive-copy-metadata: []
+
+    # An additional path to search for hooks.
+    # --additional-hooks-dir HOOKSPATH
+    additional-hooks-dir: []
+
+    # Path to a custom runtime hook file.
+    # A runtime hook is code that is bundled with the executable.
+    #   Executed before any other code or module to set up special features of the runtime environment.
+    #   --runtime-hook RUNTIME_HOOKS
+    runtime-hooks: []
+
+    # Optional module or package (the Python name, not the path name) that will be ignored (as though it was not found).
+    # --exclude-module EXCLUDES
+    excluded-modules: []
+
+    # (EXPERIMENTAL) Add an splash screen with the image IMAGE_FILE to the application.
+    # The splash screen can display progress updates while unpacking.
+    # --splash IMAGE_FILE
+    splash-image: ""
+
+  # https://pyinstaller.org/en/stable/usage.html#how-to-generate
+  # https://pyinstaller.org/en/stable/usage.html#windows-and-mac-os-x-specific-options
+  # https://pyinstaller.org/en/stable/usage.html#windows-specific-options
+  # https://pyinstaller.org/en/stable/usage.html#mac-os-specific-options
+  # https://pyinstaller.org/en/stable/usage.html#rarely-used-special-options
