@@ -13,9 +13,10 @@ def Test():
         child = subprocess.Popen(['py', 'Master.py'], cwd="obfuscated", creationflags=subprocess.CREATE_NEW_CONSOLE)
         child.communicate()[0]
         if child.returncode == 1:
-            warn("Failed to execute Master.py... Retry?")
             if CFG.obfuscator.retry:
-                Obfuscate()
+                warn("Failed to execute Master.py... Retrying")
+                return Obfuscate()
+            warn("Failed to execute Master.py...")
         else:
             success("Test completed successfully...")
     except Exception as e:
@@ -23,35 +24,35 @@ def Test():
 
 def Obfuscate():
     hyperion = CFG.obfuscator
-
     output_dir = Path(hyperion.output_dir).resolve()
+
     if output_dir.exists():
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    cmd = ['py', HYPERION_PATH]
-    cmd.append('--rename=False')
-    cmd.append('--logo=False')
-    cmd.append(f'--auto={hyperion.flags["automatic"]}')
-    cmd.append(f'--sr={hyperion.flags["rename-vars"]}')
-    cmd.append(f'--sc={hyperion.flags["protect-chunks"]}')
+    hyper_cmd = ['py', HYPERION_PATH]
+    hyper_cmd.extend([
+        '--rename=False',
+        '--logo=False',
+        f'--auto={hyperion.flags["automatic"]}',
+        f'--sr={hyperion.flags["rename-vars"]}',
+        f'--sc={hyperion.flags["protect-chunks"]}',
+    ])
 
-    for k, v in hyperion.folders.items():
-        orig = Path(k)
-
-        if isinstance(v, str):
-            pattern = '*.py'
-        else:
-            pattern = '**/*.py'
+    for folder, dest in hyperion.folders.items():
+        orig = Path(folder)
+        pattern = '**/*.py' if dest is True else '*.py'
 
         for f in orig.glob(pattern):
-            if isinstance(v, str):
-                dest = output_dir / v
+            if dest is True:
+                f_dest = output_dir / orig.relative_to(f)
             else:
-                dest = output_dir / f.parent.name
+                f_dest = output_dir / dest
+
             if f.name == '__init__.py':
-                shutil.copy2(f, dest); continue
-            x = [f'--file="{f}"', f'--destiny="{dest}/{f.name}"']
-            subprocess.run(cmd + x)
+                shutil.copy2(f, f_dest); continue
+
+            cmd = hyper_cmd + [f'--file="{f}"', f'--destiny="{f_dest}/{f.name}"']
+            subprocess.run(cmd)
             print()
     Test()
