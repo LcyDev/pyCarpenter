@@ -58,7 +58,7 @@ pyinstaller:
     command: "{python} -m pyinstaller"
     # Name of scriptfiles to be processed or exactly one .spec file.
 
-    script: "../src/wood/Master.py"
+    script: ["../src/wood/Master.py"]
     # Note: If a .spec file is specified, most options are ignored
 
     # Icon settings for the executable

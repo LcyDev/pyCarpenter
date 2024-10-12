@@ -31,8 +31,8 @@ def GetCMD_PyIns():
     cmd = []
     cmd.append(pyins.cfg["command"])
 
-    addStrIf(cmd, "--noconfirm", pyins.options["confirm-replace"])
     addStrIf(cmd, "--clean", pyins.options["clean"])
+    addStrIf(cmd, "--noconfirm", pyins.options["no-confirm"])
     addStrIf(cmd, "--onefile", pyins.options["onefile-mode"])
     joinIfStr(cmd, "--log-level=", pyins.options["log-level"])
 
@@ -51,7 +51,9 @@ def GetCMD_PyIns():
     joinIfStr(cmd, '--name=', pyins.cfg["app-name"])
     joinIfStr(cmd, '--icon=', pyins.cfg["icon"])
 
-    cmd.append(pyins.cfg["script"])
+    if isinstance(pyins.cfg["script"], list):
+        for i in pyins.cfg["script"]:
+            cmd.append(i)
     return cmd
 
 def ToggleFile(path: str, defaults: dict, state: bool, type_hint: bool):
@@ -103,6 +105,7 @@ def Compile():
     if not CFG.program.dev_build:
         ChangeDevMode(False)
     ChangeCompileMode(True)
+    full_name = f''
     print()
     ChangeCompileMode(False)
 
