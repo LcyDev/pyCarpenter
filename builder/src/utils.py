@@ -1,5 +1,10 @@
 import os
 
+from config import CFG
+
+def full_name():
+    return f'{CFG.program["name"]}_v{CFG.program["version"]}' + '_x64' if CFG.build.make_x64 else ''
+
 def CLS(new_line=True):
     if DEBUG: return
     if os.name == 'nt':
@@ -9,10 +14,12 @@ def CLS(new_line=True):
     if new_line: print()
 
 def addStrIf(iterable: list, string: str, check: bool):
-    if check: iterable.append(string)
+    if check:
+        iterable.append(string)
 
 def joinIfStr(iterable: list, body: str, string: str):
-    if string: iterable.append(body + f'"{string}"')
+    if string:
+        iterable.append(body + f'"{string}"')
 
 def extIfStr(iterable: list, string: str, other: list):
     iterable.extend([string + f'"{i}"' for i in other if i])
