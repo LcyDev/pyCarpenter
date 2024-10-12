@@ -3,40 +3,6 @@ from sty import *
 from utils.funcs import *
 import config
 
-def obfuscate():
-    if not os.path.isfile(config.pyPaths["hyperion"]):
-        warn("[WARN] Hyperion script wasn't found\n")
-        return
-    try:
-        if os.path.isdir("obfuscated"):
-            shutil.rmtree('obfuscated')
-        os.mkdir("obfuscated")
-    except Exception:
-        pass
-    for k, v in config.hyperion["folders"].items():
-        scripts = [f.name for f in os.scandir(k) if f.is_file() and f.name.endswith((".py",".pyw",".pyx"))]
-        for file in scripts:
-            path = f"{k}/{file}"
-            if file == "__init__.py":
-                shutil.copy2(f"{k}/{file}", f"obfuscated/{v}")
-                continue
-            cmd = ['py', config.pyPaths["hyperion"], f'--file="{path}"', f'--destiny="obfuscated/{v}"', '--rename=False', f'-sr={not config.hyperion["RenameVars"]}', f'-sc={not config.hyperion["ProtectChunks"]}', f'-auto={config.hyperion["automatic"]}', '-logo=False']
-            subprocess.run(cmd)
-            print(fg.rs, end='')
-    if config.hyperion["doTesting"]:
-        try:
-            child = subprocess.Popen(['py', 'Master.py'], cwd="obfuscated", creationflags=subprocess.CREATE_NEW_CONSOLE)
-            child.communicate()[0]
-            if child.returncode == 1:
-                red("Failed to execute Master.py, retrying...\n")
-                obfuscate()
-            else:
-                green("Test completed successfully...\n")
-        except Exception as e:
-            warn(f"{e}\n")
-    title()
-
-
 def build(x64=False):
     fullname = f'{config.options["name"]} v{config.options["version"]}'
     if x64:
