@@ -1,9 +1,26 @@
 import os
+from pathlib import Path
 
 from config import CFG
 
+def is_x64():
+    if CFG.build.make_x64:
+        return True
+
+def is_onefile() -> bool:
+    if CFG.build.use_nuitka:
+        return ...
+    else:
+        return CFG.pyinstaller.options["onefile-mode"]
+
+def app_dir() -> Path:
+    if CFG.build.use_nuitka:
+        return Path().resolve()
+    else:
+        return Path(CFG.pyinstaller.paths["output-path"]).resolve()
+
 def full_name():
-    return f'{CFG.program["name"]}_v{CFG.program["version"]}' + '_x64' if CFG.build.make_x64 else ''
+    return f'{CFG.program["name"]}_v{CFG.program["version"]}' + '_x64' if is_x64() else ''
 
 def CLS(new_line=True):
     if DEBUG: return
