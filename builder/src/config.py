@@ -15,7 +15,7 @@ class BuildConfig:
         auto_run: bool
 
     class package:
-        output_dir: str
+        dist_dir: str
         folders: list[str]
         excluded: list[str]
         included: list[str]
@@ -48,6 +48,8 @@ class BuildConfig:
 
 CFG = BuildConfig()
 
-def LoadConfig():
-    with open(CONFIG_PATH, 'rb') as f:
-        CFG = yaml.safe_load(f.read())
+def LoadConfig(path: str):
+    global CFG
+    with open(path, 'rb') as f:
+        data = yaml.safe_load(f.read())
+    CFG.__dict__.update(data)

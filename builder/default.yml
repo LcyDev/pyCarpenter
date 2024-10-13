@@ -21,7 +21,7 @@ build:
 
 package:
   # Output directory for the bundled application
-  output-dir: "./dist"
+  dist-dir: "./dist"
 
   # Create empty directories in the bundled application
   folders:
@@ -35,8 +35,22 @@ package:
     - "*.pyw"
 
   # Include files and directories in the bundled application
+  # Note: Use a wildcard to exclude the parent dir.
+  # Note: Use null to autoasign the parent directory
   included:
-    - "include/*"
+    - "include/*": null
+    - "%WOOD%/src/resources/soundpacks/default": "soundpacks"
+    - "%WOOD%/storage/img/wood.ico": "libraries"
+    - "%WOOD%/storage/docs/changelog.txt": null
+
+  # For main branch
+  included_new:
+    - "include/*": null
+    - "%WOOD%/wood/data": null
+    - "%WOOD%/wood/resources/language": null
+    - "%WOOD%/wood/resources/soundpacks/default": "soundpacks"
+    - "%WOOD%/storage/img/wood.ico": "libraries"
+    - "%WOOD%/docs/changelog.txt": null
 
 python:
   # Path or command to 64-bit Python executable (e.g. python.exe)
@@ -78,7 +92,7 @@ pyinstaller:
     # Where to store the generated spec file (default: current directory)
     spec-path: "./spec"
     # (ONE-DIR) Where to store all supporting files (everything except the executable itself).
-    contents-dir: "./library"
+    contents-dir: "./libraries"
     # Note: Use "." to use old ONE-DIR layout without a contents directory
 
   options:
