@@ -16,32 +16,33 @@ def get_dist_file() -> Path:
         dist_file.unlink()
     return dist_file
 
-
+def add_to_zip(zipf: zipfile.ZipFile, path: Path, include_parent: bool = True, destiny: str = None):
+    if path.is_file():
+        zipf.write(path, path.relative_to(path.parent))
+        return
+    relative = path.parent if include_parent else path
+    for root, _, files in path.walk():
+        for f in files:
+            file_path = root / f
+            if destiny:
+                zipf.write(file_path, destiny / file_path.relative_to(relative))
+            else:
+                zipf.write(file_path, file_path.relative_to(relative))
 
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
     exclusion = CFG.package.excluded
     inclusion = CFG.package.included
     with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for pattern in inclusion:
-            path = Path(pattern)
-            parent = True
-            if pattern.endswith('*'):
-                path = Path(pattern[:-1])
+        for orig, dest in inclusion.items():
+            if orig.endswith('*'):
+                path = Path(orig[:-1])
                 parent = False
-
-            if path.is_file():
-                zipf.write(path, path.relative_to(path.parent))
-            if path.is_dir():
-                for root, _, files in path.walk():
-                    for file in files:
-                        file_path = root / file
-                        zipf.write(file_path, file_path.relative_to(path.parent if parent else path))
-        for root, _, files in INCLUDE_DIR.walk():
-            for file in files:
-                file_path = root / file
-                if not any(fnmatch.fnmatch(file, pattern) for pattern in exclusion):
-                    zipf.write(file_path, file_path.relative_to(INCLUDE_DIR))
+            else:
+                path = Path(orig)
+                parent = True
+            destiny = dest if isinstance(dest, str) else None
+            add_to_zip(zipf, path, include_parent=parent, destiny=destiny)
         for root, _, files in source_dir.walk():
             for file in files:
                 file_path = root / file
