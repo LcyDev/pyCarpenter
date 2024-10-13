@@ -25,17 +25,18 @@ def create_zip_file(source_dir: Path, output_file: Path):
     with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for pattern in inclusion:
             path = Path(pattern)
+            parent = True
+            if pattern.endswith('*'):
+                path = Path(pattern[:-1])
+                parent = False
+
+            if path.is_file():
+                zipf.write(path, path.relative_to(path.parent))
             if path.is_dir():
                 for root, _, files in path.walk():
                     for file in files:
-                        zipf.write(file, file.relative_to(path))
-            elif path.is_file():
-                zipf.write(file, file.relative_to(path))
-            elif path[-1] == '*':
-                path = path[:-1]
-                for root, _, files in path.walk():
-                    for file in files:
-                        zipf.write(file, file.relative_to(root))
+                        file_path = root / file
+                        zipf.write(file_path, file_path.relative_to(path.parent if parent else path))
         for root, _, files in INCLUDE_DIR.walk():
             for file in files:
                 file_path = root / file
