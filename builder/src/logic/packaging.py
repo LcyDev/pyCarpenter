@@ -16,13 +16,26 @@ def get_dist_file() -> Path:
         dist_file.unlink()
     return dist_file
 
+
+
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
     exclusion = CFG.package.excluded
+    inclusion = CFG.package.included
     with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for i in CFG.package.included:
-            # TODO: Include files and whole folders
-            ...
+        for pattern in inclusion:
+            path = Path(pattern)
+            if path.is_dir():
+                for root, _, files in path.walk():
+                    for file in files:
+                        zipf.write(file, file.relative_to(path))
+            elif path.is_file():
+                zipf.write(file, file.relative_to(path))
+            elif path[-1] == '*':
+                path = path[:-1]
+                for root, _, files in path.walk():
+                    for file in files:
+                        zipf.write(file, file.relative_to(root))
         for root, _, files in INCLUDE_DIR.walk():
             for file in files:
                 file_path = root / file
