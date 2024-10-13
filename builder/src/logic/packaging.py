@@ -10,27 +10,41 @@ INCLUDE_DIR = Path('./include/')
 
 def get_dist_file() -> Path:
     """Get the distribution file for the bundled app."""
-    dist_file = Path(CFG.package.dist_dir).resolve() / f"{full_name()}.zip"
-    dist_file.parent.mkdir(parents=True, exist_ok=True)
+    dist_dir = Path(CFG.package.dist_dir)
+    dist_dir.mkdir(parents=True, exist_ok=True)
+
+    dist_file = dist_dir / f"{full_name()}.zip"
     if dist_file.exists():
         dist_file.unlink()
     return dist_file
 
-def add_to_zip(zipf: zipfile.ZipFile, path: Path, include_parent: bool = True, destiny: str = None):
-    """Add a file or directory to a zip file."""
-    if path.is_file():
-        zipf.write(path, path.relative_to(path.parent))
-        print(f'+ "{path}"')
-        return
-    base_path = path.parent if include_parent else path
-    print(f'Recursing directory: "{path.name}"...')
-    for p in path.rglob('*'):
-        zip_dest = p.relative_to(base_path)
+def zip_file(zipf: zipfile.ZipFile, file_path: Path, destiny: str = None):
+    """Add a file to a zip file."""
+    zip_dest = file_path.relative_to(file_path.parent)
+    if destiny:
+        zip_dest = destiny / zip_dest
+    zipf.write(file_path, zip_dest)
+    print(f'+ "{file_path}"')
+
+def zip_dir(zipf: zipfile.ZipFile, dir_path: Path, include_parent: bool = True, destiny: str = None):
+    """Add a directory to a zip file."""
+    base_path = dir_path.parent if include_parent else dir_path
+    print(f'Recursing directory: "{dir_path.name}"...')
+    for path in dir_path.rglob('*'):
+        zip_dest = path.relative_to(base_path)
         if destiny:
             zip_dest = destiny / zip_dest
-        zipf.write(p, zip_dest)
-        print(f'+ "{p}"')
+        zipf.write(path, zip_dest)
+        print(f'+ "{path}"')
     print()
+
+def add_to_zip(zipf: zipfile.ZipFile, path: Path, include_parent: bool = True, destiny: str = None):
+    if not path.exists():
+        return
+    elif path.is_file():
+        zip_dir(zipf, path, destiny)
+    elif path.is_dir():
+        zip_dir(zipf, path, include_parent, destiny)
 
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
@@ -43,6 +57,7 @@ def create_zip_file(source_dir: Path, output_file: Path):
             destiny = dest if isinstance(dest, str) else None
             add_to_zip(zipf, path, include_parent=not wild, destiny=destiny)
         for p in source_dir.rglob('*'):
+            # Fixes: Exclude files & dirs.
             match = p.as_posix() + '/' if p.is_dir() else p
             if not any(fnmatch.fnmatch(match, pattern) for pattern in exclusion):
                 zipf.write(p, p.relative_to(source_dir))
