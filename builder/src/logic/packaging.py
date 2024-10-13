@@ -43,7 +43,8 @@ def create_zip_file(source_dir: Path, output_file: Path):
             destiny = dest if isinstance(dest, str) else None
             add_to_zip(zipf, path, include_parent=not wild, destiny=destiny)
         for p in source_dir.rglob('*'):
-            if not any(fnmatch.fnmatch(p, pattern) for pattern in exclusion):
+            match = p.as_posix() + '/' if p.is_dir() else p
+            if not any(fnmatch.fnmatch(match, pattern) for pattern in exclusion):
                 zipf.write(p, p.relative_to(source_dir))
 
 def package():
