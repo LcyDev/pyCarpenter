@@ -21,13 +21,11 @@ def add_to_zip(zipf: zipfile.ZipFile, path: Path, include_parent: bool = True, d
         zipf.write(path, path.relative_to(path.parent))
         return
     relative = path.parent if include_parent else path
-    for root, _, files in path.walk():
-        for f in files:
-            file_path = root / f
-            if destiny:
-                zipf.write(file_path, destiny / file_path.relative_to(relative))
-            else:
-                zipf.write(file_path, file_path.relative_to(relative))
+    for p in path.rglob('*'):
+        if destiny:
+            zipf.write(p, destiny / p.relative_to(relative))
+        else:
+            zipf.write(p, p.relative_to(relative))
 
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
@@ -39,11 +37,9 @@ def create_zip_file(source_dir: Path, output_file: Path):
             path = Path(orig[:-1] if wild else orig)
             destiny = dest if isinstance(dest, str) else None
             add_to_zip(zipf, path, include_parent=not wild, destiny=destiny)
-        for root, _, files in source_dir.walk():
-            for file in files:
-                file_path = root / file
-                if not any(fnmatch.fnmatch(file, pattern) for pattern in exclusion):
-                    zipf.write(file_path, file_path.relative_to(source_dir))
+        for p in source_dir.rglob('*'):
+            if not any(fnmatch.fnmatch(p, pattern) for pattern in exclusion):
+                zipf.write(p, p.relative_to(source_dir))
 
 def package():
     """Package the app."""
