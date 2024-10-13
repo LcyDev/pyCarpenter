@@ -18,6 +18,7 @@ def get_dist_file() -> Path:
 
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
+    exclusion = CFG.package.excluded
     with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for i in CFG.package.included:
             # TODO: Include files and whole folders
@@ -25,13 +26,13 @@ def create_zip_file(source_dir: Path, output_file: Path):
         for root, _, files in INCLUDE_DIR.walk():
             for file in files:
                 file_path = root / file
-                # TODO: Exclude files
-                zipf.write(file_path, file_path.relative_to(INCLUDE_DIR))
+                if not any(fnmatch.fnmatch(file, pattern) for pattern in exclusion):
+                    zipf.write(file_path, file_path.relative_to(INCLUDE_DIR))
         for root, _, files in source_dir.walk():
             for file in files:
                 file_path = root / file
-                # TODO: Exclude files
-                zipf.write(file_path, file_path.relative_to(source_dir))
+                if not any(fnmatch.fnmatch(file, pattern) for pattern in exclusion):
+                    zipf.write(file_path, file_path.relative_to(source_dir))
 
 def package():
     """Package the app."""
