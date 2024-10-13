@@ -17,15 +17,16 @@ def get_dist_file() -> Path:
     return dist_file
 
 def add_to_zip(zipf: zipfile.ZipFile, path: Path, include_parent: bool = True, destiny: str = None):
+    """Add a file or directory to a zip file."""
     if path.is_file():
         zipf.write(path, path.relative_to(path.parent))
         return
-    relative = path.parent if include_parent else path
+    base_path = path.parent if include_parent else path
     for p in path.rglob('*'):
+        zip_dest = p.relative_to(base_path)
         if destiny:
-            zipf.write(p, destiny / p.relative_to(relative))
-        else:
-            zipf.write(p, p.relative_to(relative))
+            zip_dest = destiny / zip_dest
+        zipf.write(p, zip_dest)
 
 def create_zip_file(source_dir: Path, output_file: Path):
     """Create a zip file from the source directory."""
