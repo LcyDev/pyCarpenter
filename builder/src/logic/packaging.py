@@ -35,14 +35,10 @@ def create_zip_file(source_dir: Path, output_file: Path):
     inclusion = CFG.package.included
     with zipfile.ZipFile(output_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for orig, dest in inclusion.items():
-            if orig.endswith('*'):
-                path = Path(orig[:-1])
-                parent = False
-            else:
-                path = Path(orig)
-                parent = True
+            wild = orig.endswith('*')
+            path = Path(orig[:-1] if wild else orig)
             destiny = dest if isinstance(dest, str) else None
-            add_to_zip(zipf, path, include_parent=parent, destiny=destiny)
+            add_to_zip(zipf, path, include_parent=not wild, destiny=destiny)
         for root, _, files in source_dir.walk():
             for file in files:
                 file_path = root / file
