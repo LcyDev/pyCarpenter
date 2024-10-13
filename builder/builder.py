@@ -52,8 +52,7 @@ def GetCMD_PyIns():
     joinIfStr(cmd, '--icon=', pyins.cfg["icon"])
 
     if isinstance(pyins.cfg["script"], list):
-        for i in pyins.cfg["script"]:
-            cmd.append(i)
+        cmd.extend(pyins.cfg["script"])
     return cmd
 
 def ToggleFile(path: str, defaults: dict, state: bool, type_hint: bool):

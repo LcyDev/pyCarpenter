@@ -13,14 +13,23 @@ def is_onefile() -> bool:
     else:
         return CFG.pyinstaller.options["onefile-mode"]
 
-def app_dir() -> Path:
+def get_full_name():
+    name = f'{CFG.program["name"]}-{CFG.program["version"]}'
+    if is_x64():
+        name += '_x64'
+    if CFG.program.dev_build:
+        name += '-[DEV]'
+    if CFG.program.beta_build:
+        name += '-[BETA]'
+
+def get_output_dir() -> Path:
     if CFG.build.use_nuitka:
         return Path().resolve()
     else:
         return Path(CFG.pyinstaller.paths["output-path"]).resolve()
 
-def full_name():
-    return f'{CFG.program["name"]}_v{CFG.program["version"]}' + '_x64' if is_x64() else ''
+def get_app_dir() -> Path:
+    return get_output_dir() / get_full_name()
 
 def CLS(new_line=True):
     if DEBUG: return

@@ -3,7 +3,7 @@ from pathlib import Path
 from sty import fg
 
 from config import CFG
-from utils import full_name, warn, success
+from utils import get_full_name, get_output_dir, warn, success
 
 SIGNER_PATH = 'signer'
 CERT_PATH = 'woodcert_private.pfx'
@@ -41,9 +41,9 @@ def signer():
     print(fg.yellow)
 
     found = False
-    output_path = Path(CFG.pyinstaller.paths["output-path"])
+    output_dir = get_output_dir()
     for suffix in files:
-        file_path = output_path / f"{full_name()}{suffix}.exe"
+        file_path = output_dir / f"{get_full_name()}{suffix}.exe"
         if not file_path.exists():
             continue
 

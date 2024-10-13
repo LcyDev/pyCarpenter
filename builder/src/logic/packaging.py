@@ -4,7 +4,7 @@ from pathlib import Path
 from sty import fg
 
 from config import CFG
-from utils import full_name, app_dir
+from utils import get_full_name, get_app_dir
 
 INCLUDE_DIR = Path('./include/')
 
@@ -13,7 +13,7 @@ def get_dist_file() -> Path:
     dist_dir = Path(CFG.package.dist_dir)
     dist_dir.mkdir(parents=True, exist_ok=True)
 
-    dist_file = dist_dir / f"{full_name()}.zip"
+    dist_file = dist_dir / f"{get_full_name()}.zip"
     if dist_file.exists():
         dist_file.unlink()
     return dist_file
@@ -56,16 +56,19 @@ def create_zip_file(source_dir: Path, output_file: Path):
             path = Path(orig[:-1] if wild else orig)
             destiny = dest if isinstance(dest, str) else None
             add_to_zip(zipf, path, include_parent=not wild, destiny=destiny)
+
+        print("Iterating through built app:")
         for p in source_dir.rglob('*'):
             # Fixes: Exclude files & dirs.
             match = p.as_posix() + '/' if p.is_dir() else p
             if not any(fnmatch.fnmatch(match, pattern) for pattern in exclusion):
                 zipf.write(p, p.relative_to(source_dir))
+                print(f'+ "{p}"')
 
 def package():
     """Package the app."""
-    source_dir = app_dir() / full_name()
-    if not source_dir.exists(): return
+    app_dir = get_app_dir()
+    if not app_dir.exists(): return
 
     for folder in CFG.package.folders:
         empty = INCLUDE_DIR / folder
@@ -78,4 +81,4 @@ def package():
     print("│      APPackager      │")
     print("╚======================╝")
     print(fg.yellow)
-    create_zip_file(source_dir, dist_file)
+    create_zip_file(app_dir, dist_file)

@@ -5,15 +5,9 @@ from time import sleep
 from sty import *
 import pathlib, shutil
 
-CONFIG_PATH = "./config.json"
 MASTERPY_DIR = "../src/wood/Master.py"
-SOUNDPACKFUNCS_DIR = "../src/wood/utils/soundpack_funcs.py"
-_VARSPY_DIR = "../src/wood/game/_vars.py"
 
 compiling = False
-
-def ChangelogGenerator( file ):
-    pass
 
 def CreateBuild( bits: str ):
     buildPath = pathlib.Path(f"{config.builder['output-dir']}/{bits}")
@@ -50,8 +44,9 @@ def Compile( bits: str, params: list ):
 
     compiling = True
     Thread(target=TitleLoop, args=(bits, ), daemon=True).start()
-    try: subprocess.run( f'"{config.python[bits]}" -m nuitka {cmd}', creationflags=flags )
-    except:
+    try:
+        subprocess.run( f'"{config.python[bits]}" -m nuitka {cmd}', creationflags=flags )
+    except Exception:
         return
     compiling = False
 
