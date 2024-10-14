@@ -40,7 +40,7 @@ def SetDevMode(state: bool):
     CODE_PY = WOOD_ROOT / 'data/_code.py'
     ToggleFile(CODE_PY, code_defaults, state, type_hint=True)
 
-def SetCompileMode(state: bool):
+def SetIsCompiled(state: bool):
     master_defaults = {
         'IS_COMPILED': None,
     }
