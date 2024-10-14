@@ -1,5 +1,11 @@
 import yaml
 
+DEBUG = False
+
+class Work:
+    compiling: bool
+    bits: str
+
 class BuildConfig:
     class program:
         name: str

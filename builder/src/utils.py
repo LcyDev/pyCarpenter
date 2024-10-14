@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from config import CFG
+from config import CFG, DEBUG
 
 def is_x64():
     if CFG.build.make_x64:
@@ -15,12 +15,12 @@ def is_onefile() -> bool:
 
 def get_full_name():
     name = f'{CFG.program["name"]}-{CFG.program["version"]}'
-    if is_x64():
-        name += '_x64'
     if CFG.program.dev_build:
         name += '-[DEV]'
     if CFG.program.beta_build:
         name += '-[BETA]'
+    if is_x64():
+        name += '_x64'
 
 def get_output_dir() -> Path:
     if CFG.build.use_nuitka:
