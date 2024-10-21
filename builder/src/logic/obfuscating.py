@@ -10,9 +10,8 @@ def test_result():
     if not CFG.obfuscator.testing: return
 
     try:
-        child = subprocess.Popen(['py', 'Master.py'], cwd="obfuscated", creationflags=subprocess.CREATE_NEW_CONSOLE)
-        child.communicate()[0]
-        if child.returncode == 1:
+        result = subprocess.run(['py', 'Master.py'], cwd="obfuscated", creationflags=subprocess.CREATE_NEW_CONSOLE)
+        if result.returncode == 1:
             if CFG.obfuscator.retry:
                 warn("Failed to execute Master.py... Retrying")
                 return obfuscate()
@@ -50,6 +49,7 @@ def obfuscate_folder(folder, dest, hyperion, output_dir):
     """Obfuscate files in a folder using Hyperion."""
     orig = Path(folder)
     pattern = '**/*.py' if dest is True else '*.py'
+    hyper_cmd = build_hyperion_command(hyperion)
 
     for f in orig.glob(pattern):
         if dest is True:
@@ -61,7 +61,7 @@ def obfuscate_folder(folder, dest, hyperion, output_dir):
             shutil.copy2(f, f_dest)
             continue
 
-        obfuscate_file(f, f_dest, build_hyperion_command(hyperion))
+        obfuscate_file(f, f_dest, hyper_cmd)
 
 
 def obfuscate():

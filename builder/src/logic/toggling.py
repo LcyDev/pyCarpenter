@@ -6,7 +6,7 @@ WOOD_ROOT = Path('wood/src/main/')
 def ToggleFile(path: Path, defaults: dict, state: bool, type_hint: bool):
     if not path.exists():
         return
-    hint = ': bool'*type_hint
+    hint = ': bool' * type_hint
 
     with open(path, 'r') as f:
         content = f.read()
@@ -21,6 +21,13 @@ def ToggleFile(path: Path, defaults: dict, state: bool, type_hint: bool):
 
     with open(path, 'w') as f:
         f.write(content)
+
+def SetIsCompiled(state: bool):
+    master_defaults = {
+        'IS_COMPILED': None,
+    }
+    MASTER_PY = WOOD_ROOT / 'Master.py'
+    ToggleFile(MASTER_PY, master_defaults, state, type_hint=False)
 
 def SetDevMode(state: bool):
     code_defaults = {
@@ -39,10 +46,3 @@ def SetDevMode(state: bool):
     }
     CODE_PY = WOOD_ROOT / 'data/_code.py'
     ToggleFile(CODE_PY, code_defaults, state, type_hint=True)
-
-def SetIsCompiled(state: bool):
-    master_defaults = {
-        'IS_COMPILED': None,
-    }
-    MASTER_PY = WOOD_ROOT / 'Master.py'
-    ToggleFile(MASTER_PY, master_defaults, state, type_hint=False)

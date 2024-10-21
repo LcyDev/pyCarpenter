@@ -18,9 +18,8 @@ def display_sdk_info():
 def sign_file(file_path):
     """Sign a given file using the signing command."""
     cmd = [SIGNER_PATH, 'sign', '/fd', 'SHA256', '/f', CERT_PATH, '/p', PASSWD, file_path]
-    child = subprocess.Popen(cmd)
-    child.communicate()[0]
-    return child.returncode
+    result = subprocess.run(cmd)
+    return result.returncode
 
 def signer():
     """Main function to sign executable files."""
