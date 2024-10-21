@@ -1,11 +1,10 @@
 import os
 from pathlib import Path
 
-from config import CFG, DEBUG
+from config import CFG, DEBUG, Work
 
-def is_x64():
-    if CFG.build.make_x64:
-        return True
+def Set64Bits(state: bool):
+    Work.bits = '64' if state else '32'
 
 def is_onefile() -> bool:
     if CFG.build.use_nuitka:
@@ -19,8 +18,10 @@ def get_full_name():
         name += '-[DEV]'
     if CFG.program.beta_build:
         name += '-[BETA]'
-    if is_x64():
+    if Work.is_x64():
         name += '_x64'
+    else:
+        name += '_x86'
 
 def get_output_dir() -> Path:
     if CFG.build.use_nuitka:
@@ -39,13 +40,16 @@ def CLS(new_line=True):
         os.system('clear')
     if new_line: print()
 
-def addStrIf(iterable: list, string: str, check: bool):
-    if check:
-        iterable.append(string)
+def addStrIf(target: list, item: str, condition: bool):
+    """Append an item to the list if the condition is True."""
+    if condition:
+        target.append(item)
 
-def joinIfStr(iterable: list, body: str, string: str):
-    if string:
-        iterable.append(body + f'"{string}"')
+def joinIfStr(target: list, prefix: str, item: str):
+    """Join a prefix with the item and append to the list if the item is not empty."""
+    if item:
+        target.append(prefix + f'"{item}"')
 
-def extIfStr(iterable: list, string: str, other: list):
-    iterable.extend([string + f'"{i}"' for i in other if i])
+def extIfStr(target: list, prefix: str, items: list):
+    """Extend the list with prefixed items from another list if they are not empty."""
+    target.extend([prefix + f'"{i}"' for i in items if i])
