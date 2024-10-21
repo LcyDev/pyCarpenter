@@ -6,6 +6,9 @@ class Work:
     compiling: bool
     bits: str
 
+    def is_x64(self):
+        return self.bits.endswith("64")
+
 class BuildConfig:
     class program:
         name: str
