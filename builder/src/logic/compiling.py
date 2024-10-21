@@ -1,9 +1,23 @@
+import subprocess
+import time
+from pathlib import Path
+
 from config import CFG, DEBUG, Work
-from utils import CLS, addStrIf, joinIfStr, extIfStr
-
 from logic.toggling import SetDevMode, SetIsCompiled
+from sty import bg, fg
+from utils import (
+    CLS,
+    Set64Bits,
+    addStrIf,
+    extIfStr,
+    get_app_dir,
+    get_full_name,
+    is_onefile,
+    joinIfStr,
+)
 
-def GetCMD_FLAGS():
+
+def GetFLAGS():
     flags = 0
     if CFG.python["show_progress"]:
         flags |= subprocess.CREATE_NO_WINDOW
@@ -37,16 +51,60 @@ def GetCMD_PyIns():
     extIfStr(cmd, '--hidden-import=', pyins.hidden_imports)
     cmd.extend([i for i in pyins.extras if i])
 
-    joinIfStr(cmd, '--name=', pyins.cfg["app-name"])
+    joinIfStr(cmd, '--name=', get_full_name())
     joinIfStr(cmd, '--icon=', pyins.cfg["icon"])
 
     if isinstance(pyins.cfg["script"], list):
         cmd.extend(pyins.cfg["script"])
     return cmd
 
+def EXERenamer(product: Path):
+    if CFG.build.use_nuitka:
+        ...
+    else:
+        exe = Path(product / get_full_name() + '.exe')
+        exe.rename(product / CFG.pyinstaller.cfg["name"] + ".exe")
+
+def DoStuff(x64: bool):
+    Set64Bits(x64)
+    print(fg.li_blue, end='')
+    print("╔=============================╗")
+    print("│                             │")
+    print("│        Building with        │")
+    print("│          %sBits...          │" %Work.bits)
+    print("╚=============================╝")
+    print(fg.rs)
+    start_time = time.perf_counter()
+    flags = GetFLAGS()
+    if CFG.build.use_nuitka:
+        cmd = GetCMD_Nuitka()
+    else:
+        cmd = GetCMD_PyIns()
+    Work.compiling = True
+    result = subprocess.run(cmd, creationflags=flags)
+    product = get_app_dir()
+    if not is_onefile():
+        EXERenamer(product)
+    Work.compiling = False
+    if result.returncode == 1:
+        print('Failed to build "{product}" using params:')
+        print(f"{fg.red}<< {fg.cyan}{' '.join(cmd)} {fg.red}>>")
+        print(fg.rs)
+        return False
+    else:
+        time_taken = time.perf_counter() - start_time
+        print(f'Successfully Built "{product}" in {time_taken}')
+        print(fg.rs)
+        return True
+
 def Compile():
-    if not CFG.program.dev_build:
-        SetDevMode(False)
+    # Setup
     SetIsCompiled(True)
-    print(...)
+    SetDevMode(CFG.program.dev_build)
+    # Compile
+    if CFG.build.make_x64:
+        DoStuff(True)
+    if CFG.build.make_x86:
+        DoStuff(False)
+    # End
     SetIsCompiled(False)
