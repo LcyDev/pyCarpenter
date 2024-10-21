@@ -1,8 +1,9 @@
-import subprocess, shutil
+import shutil
+import subprocess
 from pathlib import Path
 
-from utils import error, warn, success
 from config import CFG
+from utils import error, success, warn
 
 HYPERION_PATH = "hyperion.py"
 

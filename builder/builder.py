@@ -1,7 +1,8 @@
-import os, sys
-from sty import fg, bg
+import os
+import sys
 
-from src.config import CFG, Work, LoadConfig
+from src.config import LoadConfig, Work
+from sty import bg, fg
 
 BUILDER_VERSION = 4.0
 CONFIG_PATH = "config.yml"

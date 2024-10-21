@@ -3,6 +3,16 @@ from pathlib import Path
 
 from config import CFG, DEBUG, Work
 
+
+def success(msg: str):
+    ...
+
+def warn(msg: str):
+    ...
+
+def error(e: Exception):
+    ...
+
 def Set64Bits(state: bool):
     Work.bits = '64' if state else '32'
 

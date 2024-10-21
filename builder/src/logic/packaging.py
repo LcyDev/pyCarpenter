@@ -1,10 +1,10 @@
-import zipfile
 import fnmatch
+import zipfile
 from pathlib import Path
-from sty import fg
 
 from config import CFG
-from utils import get_full_name, get_app_dir
+from sty import fg
+from utils import get_app_dir, get_full_name
 
 INCLUDE_DIR = Path('./include/')
 

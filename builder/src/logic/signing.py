@@ -1,9 +1,9 @@
 import subprocess
 from pathlib import Path
-from sty import fg
 
 from config import CFG
-from utils import get_full_name, get_output_dir, warn, success
+from sty import fg
+from utils import get_full_name, get_output_dir, success, warn
 
 SIGNER_PATH = 'signer'
 CERT_PATH = 'woodcert_private.pfx'
