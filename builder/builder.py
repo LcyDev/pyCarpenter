@@ -1,7 +1,7 @@
 import os
 import sys
 
-from src.config import LoadConfig, Work
+from src.config import LoadConfig, WORK
 from sty import bg, fg
 
 BUILDER_VERSION = 4.0
@@ -45,8 +45,8 @@ def Title(text: str = f"pyCarpenter v{BUILDER_VERSION}"):
 def TitleLoop():
     import time
     dots = 0
-    while Work.compiling:
-        Title(f"Building {Work.bits}{'.'*dots}")
+    while WORK.compiling:
+        Title(f"Building {WORK.bits}{'.'*dots}")
         dots = (dots + 1) % 4
         time.sleep(1)
     Title()
