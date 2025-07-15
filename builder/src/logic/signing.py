@@ -29,8 +29,8 @@ def signer():
 
     files = [
         '',
-        f'/{CFG.program["name"]}',
-        f'/{CFG.pyinstaller["cfg"]["app-name"]}',
+        f'/{CFG.program.name}',
+        f'/{CFG.pyinstaller.cfg["app-name"]}',
     ]
 
     print(fg(11), end='')
