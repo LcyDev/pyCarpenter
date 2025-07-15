@@ -2,12 +2,10 @@ import subprocess
 import time
 from pathlib import Path
 
-from config import CFG, DEBUG, Work
+from config import CFG, WORK
 from logic.toggling import SetDevMode, SetIsCompiled
 from sty import bg, fg
 from utils import (
-    CLS,
-    Set64Bits,
     addStrIf,
     extIfStr,
     get_app_dir,
@@ -19,7 +17,7 @@ from utils import (
 
 def GetFLAGS():
     flags = 0
-    if CFG.python["show_progress"]:
+    if not CFG.python["show_progress"]:
         flags |= subprocess.CREATE_NO_WINDOW
 
 def GetCMD_Nuitka():
@@ -66,12 +64,12 @@ def EXERenamer(product: Path):
         exe.rename(product / CFG.pyinstaller.cfg["name"] + ".exe")
 
 def DoStuff(x64: bool):
-    Set64Bits(x64)
+    WORK.set_x64(x64)
     print(fg.li_blue, end='')
     print("╔=============================╗")
     print("│                             │")
     print("│        Building with        │")
-    print("│          %sBits...          │" %Work.bits)
+    print("│          %sBits...          │" %WORK.bits)
     print("╚=============================╝")
     print(fg.rs)
     start_time = time.perf_counter()
@@ -80,12 +78,12 @@ def DoStuff(x64: bool):
         cmd = GetCMD_Nuitka()
     else:
         cmd = GetCMD_PyIns()
-    Work.compiling = True
+    WORK.compiling = True
     result = subprocess.run(cmd, creationflags=flags)
     product = get_app_dir()
     if not is_onefile():
         EXERenamer(product)
-    Work.compiling = False
+    WORK.compiling = False
     if result.returncode == 1:
         print('Failed to build "{product}" using params:')
         print(f"{fg.red}<< {fg.cyan}{' '.join(cmd)} {fg.red}>>")
