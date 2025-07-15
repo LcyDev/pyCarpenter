@@ -7,11 +7,12 @@ program:
   beta-build: true
 
 build:
-  # Use the nuitka compiler instead of Pyinstaller.
+  # Use the nuitka compiler instead of PyInstaller.
   use-nuitka: false
   # Build 64-bit executables.
-  # If false: Only 32-bit executables will be built.
   make-x64: false
+  # Build 32-bit executables.
+  make-x86: true
   # Ensure the program works before building.
   test-before: true
   # Clean the build directory before building.
@@ -60,7 +61,10 @@ python:
   # Display progress during execution
   show-progress: true
 
-nuitka: TODO
+nuitka:
+  cfg:
+    app-name: "Wood"
+    command: "{python} -m nuitka"
 
 # https://pyinstaller.org/en/stable/usage.html#options
 pyinstaller:
@@ -69,7 +73,7 @@ pyinstaller:
     app-name: "Wood"
 
     # Command to use for PyInstaller. Use {python} for the Python executable
-    command: "{python} -m pyinstaller"
+    command: "{python} -m PyInstaller"
     # Name of scriptfiles to be processed or exactly one .spec file.
 
     script: ["../src/wood/Master.py"]
