@@ -1,0 +1,2 @@
+CODE_VERSION = '4.0.0 alpha'
+CONFIG_FORMAT = '2.0 beta'
