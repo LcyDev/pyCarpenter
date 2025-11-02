@@ -1,5 +1,6 @@
 import yaml
 from typing import Any
+from pathlib import Path
 
 DEBUG = False
 
@@ -63,8 +64,15 @@ class BuildConfig:
 CFG = BuildConfig()
 WORK = Work()
 
-def LoadConfig(path: str):
+def LoadConfig(file: Path, default: Path):
     global CFG
+    if file.is_file():
+        path = file
+    elif default.is_file():
+        path = file
+    else:
+        return
+
     with open(path, 'rb') as f:
         data = yaml.safe_load(f.read())
     CFG.__dict__.update(data)

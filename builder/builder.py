@@ -52,7 +52,7 @@ def TitleLoop():
     Title()
 
 def Setup():
-    LoadConfig()
+    LoadConfig(CONFIG_PATH, DEFAULT_CFG_PATH)
     Title()
     Splash()
 
